@@ -8,14 +8,18 @@
 </head>
 <body>
 
-  <!-- Pantalla de bienvenida: fondo + logo grande + botón, sin topbar -->
+  <!-- Pantalla de bienvenida: vídeo de fondo + logo grande + botón, sin topbar -->
   <div class="landing" id="landing-screen">
+    <video class="landing__bg-video" autoplay loop muted playsinline></video>
+    <div class="landing__bg-overlay"></div>
     <img class="landing__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
     <button class="btn landing__enter-btn" id="landing-enter-btn">Entrar / Registrarse</button>
   </div>
 
-  <!-- Formulario de login/registro (oculto hasta pulsar el botón), con el mismo fondo -->
+  <!-- Formulario de login/registro (oculto hasta pulsar el botón), con el mismo vídeo de fondo -->
   <div class="landing landing--hidden" id="auth-screen">
+    <video class="landing__bg-video" autoplay loop muted playsinline></video>
+    <div class="landing__bg-overlay"></div>
     <div class="auth-card">
       <h1 id="form-title">Iniciar sesión</h1>
 
@@ -49,10 +53,10 @@
     const authScreen = document.getElementById("auth-screen");
     const landingEnterBtn = document.getElementById("landing-enter-btn");
 
-    // Aplica el fondo a ambas pantallas
-    const bg = `url("${CONFIG.BACKGROUND_PATH}")`;
-    landingScreen.style.backgroundImage = bg;
-    authScreen.style.backgroundImage = bg;
+    // Aplica el mismo vídeo a ambas pantallas
+    document.querySelectorAll(".landing__bg-video").forEach((video) => {
+      video.src = CONFIG.BACKGROUND_PATH;
+    });
 
     // Si ya hay sesión activa, va directo al canvas
     fetchMe().then((user) => { if (user) window.location.href = "/canvas.html"; });
