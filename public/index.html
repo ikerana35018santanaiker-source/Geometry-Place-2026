@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Geometry Place — Acceso</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <img class="site-header__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
+    <span>Geometry Place</span>
+  </header>
+
+  <div class="auth-card">
+    <h1 id="form-title">Iniciar sesión</h1>
+
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Correo" required />
+      <input type="password" id="login-password" placeholder="Contraseña" required />
+      <div class="auth-card__error" id="login-error"></div>
+      <button class="btn" type="submit" style="width:100%">Entrar</button>
+    </form>
+
+    <form id="register-form" style="display:none">
+      <input type="email" id="register-email" placeholder="Correo" required />
+      <input type="text" id="register-username" placeholder="Nombre de usuario" required />
+      <input type="password" id="register-password" placeholder="Contraseña (mín. 8 caracteres)" required />
+      <div class="auth-card__error" id="register-error"></div>
+      <button class="btn" type="submit" style="width:100%">Crear cuenta</button>
+    </form>
+
+    <div class="auth-card__switch">
+      <span id="switch-to-register">¿No tienes cuenta? <a>Regístrate</a></span>
+      <span id="switch-to-login" style="display:none">¿Ya tienes cuenta? <a>Inicia sesión</a></span>
+    </div>
+  </div>
+
+  <script type="module">
+    import { login, register, fetchMe } from "/js/auth.js";
+
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    const formTitle = document.getElementById("form-title");
+    const switchToRegister = document.getElementById("switch-to-register");
+    const switchToLogin = document.getElementById("switch-to-login");
+
+    // Si ya hay sesión activa, va directo al canvas
+    fetchMe().then((user) => { if (user) window.location.href = "/canvas.html"; });
+
+    switchToRegister.querySelector("a").addEventListener("click", () => {
+      loginForm.style.display = "none";
+      registerForm.style.display = "block";
+      formTitle.textContent = "Crear cuenta";
+      switchToRegister.style.display = "none";
+      switchToLogin.style.display = "block";
+    });
+
+    switchToLogin.querySelector("a").addEventListener("click", () => {
+      registerForm.style.display = "none";
+      loginForm.style.display = "block";
+      formTitle.textContent = "Iniciar sesión";
+      switchToLogin.style.display = "none";
+      switchToRegister.style.display = "block";
+    });
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById("login-error");
+      errorEl.textContent = "";
+      try {
+        await login(
+          document.getElementById("login-email").value,
+          document.getElementById("login-password").value
+        );
+        window.location.href = "/canvas.html";
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    });
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById("register-error");
+      errorEl.textContent = "";
+      try {
+        await register(
+          document.getElementById("register-email").value,
+          document.getElementById("register-username").value,
+          document.getElementById("register-password").value
+        );
+        window.location.href = "/canvas.html";
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

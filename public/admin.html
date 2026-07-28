@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Geometry Place — Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <img class="site-header__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
+    <span>Geometry Place — Admin</span>
+    <div class="site-header__spacer"></div>
+    <button class="btn" id="logout-btn">Salir</button>
+  </header>
+
+  <div class="admin-panel">
+    <div class="admin-actions">
+      <button class="btn" id="start-event-btn">Iniciar evento (7 días)</button>
+      <button class="btn" id="finish-event-btn">Forzar fin del evento</button>
+      <span id="event-status"></span>
+    </div>
+
+    <h2>Usuarios</h2>
+    <table>
+      <thead>
+        <tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr>
+      </thead>
+      <tbody id="users-table-body"></tbody>
+    </table>
+
+    <p><a href="/test.html" style="color:#7fb0ff">Ir al panel de testeo →</a></p>
+  </div>
+
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>
