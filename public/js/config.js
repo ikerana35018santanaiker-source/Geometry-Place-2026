@@ -10,7 +10,7 @@ export const CONFIG = {
 
   // Rutas de assets (relativas a la raíz del sitio)
   LOGO_PATH: "/assets/logo/Geometry Place.png",
-  BACKGROUND_PATH: "/assets/background/initial-bg.mp4",
+  BACKGROUND_PATH: "https://ia600507.us.archive.org/0/items/initial-bg/initial-bg.mp4",
   FONTS_PATH: "/assets/fonts/",
   ICONS_PATH: "/assets/gd-imgs/",
   NUMBERS_PATH: "/assets/countdown/", // img_0.png ... img_200.png
