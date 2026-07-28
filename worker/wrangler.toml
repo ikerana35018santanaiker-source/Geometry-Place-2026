@@ -1,0 +1,26 @@
+name = "gd-place-worker"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+# Base de datos D1 (cuentas, sesiones, estado del evento).
+# Crea la DB con: wrangler d1 create gd-place-db
+# y pega aquí el "database_id" que te devuelva.
+[[d1_databases]]
+binding = "DB"
+database_name = "gd-place-db"
+database_id = "PON_AQUI_TU_DATABASE_ID"
+
+# Variables públicas (no secretas). Las URLs de Supabase son públicas por diseño.
+[vars]
+SUPABASE_URL = "https://TU-PROYECTO.supabase.co"
+ALLOWED_ORIGIN = "http://localhost:8788"
+
+# Secretos — NUNCA los pongas aquí en texto plano. Se configuran con:
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   wrangler secret put SESSION_SECRET
+# SUPABASE_SERVICE_ROLE_KEY: la service_role key de tu proyecto Supabase
+#   (Settings > API). Se usa para que el worker pueda escribir en Supabase
+#   saltándose RLS, sin exponerla nunca al navegador.
+# SESSION_SECRET: cualquier cadena aleatoria larga, para firmar tokens si
+#   en el futuro se cambia a JWT (por ahora las sesiones son tokens opacos
+#   guardados en D1, no hace falta firmarlos).
