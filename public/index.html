@@ -2,51 +2,71 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Geometry Place — Acceso</title>
+<title>Geometry Place</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <img class="site-header__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
-    <span>Geometry Place</span>
-  </header>
 
-  <div class="auth-card">
-    <h1 id="form-title">Iniciar sesión</h1>
+  <!-- Pantalla de bienvenida: fondo + logo grande + botón, sin topbar -->
+  <div class="landing" id="landing-screen">
+    <img class="landing__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
+    <button class="btn landing__enter-btn" id="landing-enter-btn">Entrar / Registrarse</button>
+  </div>
 
-    <form id="login-form">
-      <input type="email" id="login-email" placeholder="Correo" required />
-      <input type="password" id="login-password" placeholder="Contraseña" required />
-      <div class="auth-card__error" id="login-error"></div>
-      <button class="btn" type="submit" style="width:100%">Entrar</button>
-    </form>
+  <!-- Formulario de login/registro (oculto hasta pulsar el botón), con el mismo fondo -->
+  <div class="landing landing--hidden" id="auth-screen">
+    <div class="auth-card">
+      <h1 id="form-title">Iniciar sesión</h1>
 
-    <form id="register-form" style="display:none">
-      <input type="email" id="register-email" placeholder="Correo" required />
-      <input type="text" id="register-username" placeholder="Nombre de usuario" required />
-      <input type="password" id="register-password" placeholder="Contraseña (mín. 8 caracteres)" required />
-      <div class="auth-card__error" id="register-error"></div>
-      <button class="btn" type="submit" style="width:100%">Crear cuenta</button>
-    </form>
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="Correo" required />
+        <input type="password" id="login-password" placeholder="Contraseña" required />
+        <div class="auth-card__error" id="login-error"></div>
+        <button class="btn" type="submit" style="width:100%">Entrar</button>
+      </form>
 
-    <div class="auth-card__switch">
-      <span id="switch-to-register">¿No tienes cuenta? <a>Regístrate</a></span>
-      <span id="switch-to-login" style="display:none">¿Ya tienes cuenta? <a>Inicia sesión</a></span>
+      <form id="register-form" style="display:none">
+        <input type="email" id="register-email" placeholder="Correo" required />
+        <input type="text" id="register-username" placeholder="Nombre de usuario" required />
+        <input type="password" id="register-password" placeholder="Contraseña (mín. 8 caracteres)" required />
+        <div class="auth-card__error" id="register-error"></div>
+        <button class="btn" type="submit" style="width:100%">Crear cuenta</button>
+      </form>
+
+      <div class="auth-card__switch">
+        <span id="switch-to-register">¿No tienes cuenta? <a>Regístrate</a></span>
+        <span id="switch-to-login" style="display:none">¿Ya tienes cuenta? <a>Inicia sesión</a></span>
+      </div>
     </div>
   </div>
 
   <script type="module">
+    import { CONFIG } from "/js/config.js";
     import { login, register, fetchMe } from "/js/auth.js";
+
+    const landingScreen = document.getElementById("landing-screen");
+    const authScreen = document.getElementById("auth-screen");
+    const landingEnterBtn = document.getElementById("landing-enter-btn");
+
+    // Aplica el fondo a ambas pantallas
+    const bg = `url("${CONFIG.BACKGROUND_PATH}")`;
+    landingScreen.style.backgroundImage = bg;
+    authScreen.style.backgroundImage = bg;
+
+    // Si ya hay sesión activa, va directo al canvas
+    fetchMe().then((user) => { if (user) window.location.href = "/canvas.html"; });
+
+    landingEnterBtn.addEventListener("click", () => {
+      landingScreen.classList.add("landing--hidden");
+      authScreen.classList.remove("landing--hidden");
+    });
 
     const loginForm = document.getElementById("login-form");
     const registerForm = document.getElementById("register-form");
     const formTitle = document.getElementById("form-title");
     const switchToRegister = document.getElementById("switch-to-register");
     const switchToLogin = document.getElementById("switch-to-login");
-
-    // Si ya hay sesión activa, va directo al canvas
-    fetchMe().then((user) => { if (user) window.location.href = "/canvas.html"; });
 
     switchToRegister.querySelector("a").addEventListener("click", () => {
       loginForm.style.display = "none";
