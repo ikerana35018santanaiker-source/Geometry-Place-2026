@@ -1,3 +1,4 @@
+import "./devconsole.js";
 import { CONFIG } from "./config.js";
 import { requireAuth, logout, fetchPublicUsers, getToken } from "./auth.js";
 import {
@@ -7,6 +8,7 @@ import {
 } from "./supabaseClient.js";
 import { Countdown } from "./countdown.js";
 import { CATEGORY_TABS, getObjectFile } from "./objects-catalog.js";
+import { renderConsoleInto, clearConsole } from "./devconsole.js";
 
 const CANVAS_SIZES = {
   classic: { width: 1920, height: 1080 },
@@ -58,6 +60,7 @@ async function init() {
   wireModeSwitch();
   wireZoomButtons();
   wireVoteView();
+  wireConsoleView();
 
   await loadUserTickers();
   await loadEventStateAndRoute();
@@ -71,8 +74,13 @@ function wireHeaderButtons() {
 
   document.getElementById("admin-nav-btn").addEventListener("click", () => showView("view-admin"));
   document.getElementById("test-nav-btn").addEventListener("click", () => showView("view-test"));
+  document.getElementById("console-nav-btn").addEventListener("click", () => {
+    showView("view-console");
+    renderConsoleInto(document.getElementById("console-output"));
+  });
   document.getElementById("admin-back-btn").addEventListener("click", () => showView(mainViewName));
   document.getElementById("test-back-btn").addEventListener("click", () => showView(mainViewName));
+  document.getElementById("console-back-btn").addEventListener("click", () => showView(mainViewName));
 }
 
 // ------------------------------------------------------------------
@@ -581,6 +589,15 @@ async function refreshAdminUsers() {
     actionsCell.appendChild(btn);
     body.appendChild(tr);
   }
+}
+
+// ------------------------------------------------------------------
+// Vista consola (temporal — quitar antes de publicar)
+// ------------------------------------------------------------------
+function wireConsoleView() {
+  document.getElementById("console-clear-btn").addEventListener("click", () => {
+    clearConsole();
+  });
 }
 
 // ------------------------------------------------------------------
