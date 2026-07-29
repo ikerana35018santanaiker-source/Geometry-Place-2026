@@ -20,9 +20,19 @@ const GD_UNIT = 30; // 1 casilla de cuadrícula en Geometry Dash = 30 unidades
 
 // Convierte nuestras coordenadas de canvas (origen arriba-izquierda, Y hacia abajo)
 // a coordenadas de Geometry Dash (origen en el suelo, Y hacia arriba).
+// Convierte nuestras coordenadas de canvas (origen arriba-izquierda, Y hacia abajo)
+// a coordenadas de Geometry Dash (origen en el suelo, Y hacia arriba).
+//
+// IMPORTANTE: el alto del canvas (1080 / 1026 px) no es múltiplo exacto de
+// GRID_UNIT_PX, así que la última fila (la que toca el suelo) quedaría
+// cortada a la mitad si usáramos el alto real tal cual. Para que los
+// objetos de la fila inferior queden pegados al suelo (y no floten un
+// poco por encima, como pasaba antes), alineamos el "suelo" de referencia
+// al múltiplo de 32 más cercano hacia arriba antes de invertir la Y.
 function toGdCoords(x, y, canvasHeightPx) {
+  const groundAlignedHeight = Math.ceil(canvasHeightPx / GRID_UNIT_PX) * GRID_UNIT_PX;
   const gdX = (x / GRID_UNIT_PX) * GD_UNIT;
-  const gdY = ((canvasHeightPx - y) / GRID_UNIT_PX) * GD_UNIT;
+  const gdY = ((groundAlignedHeight - y) / GRID_UNIT_PX) * GD_UNIT;
   return { gdX: round2(gdX), gdY: round2(gdY) };
 }
 
@@ -51,7 +61,9 @@ export function buildObjectString(objects, canvasHeightPx) {
     if (obj.scale && obj.scale !== 1) props.push(32, round2(obj.scale));
     // Color: si el objeto pide un color propio, apunta al canal 1 (Color 1) por
     // simplicidad — el canal en sí se define en el color string con ese hex.
-    if (obj.color) props.push(21, 1);
+    // Siempre se asigna un canal de color válido (Color 1) — si no, Geometry
+    // Dash pinta el objeto en negro sólido por no tener canal definido.
+    props.push(21, 1);
 
     parts.push(props.join(","));
   }
