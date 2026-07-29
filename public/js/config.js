@@ -4,7 +4,7 @@
 
 export const CONFIG = {
   SITE_NAME: "Geometry Place",
-  WORKER_URL: "http://localhost:8787", // URL de tu Worker desplegado en producción
+  WORKER_URL: "https://geometryplace.ikerana35018santanaiker.workers.dev/", // URL de tu Worker desplegado en producción
   SUPABASE_URL: "https://lklbmneoukmkgzfvbznl.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrbGJtbmVvdWtta2d6ZnZiem5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMjYxNzUsImV4cCI6MjEwMDgwMjE3NX0.qDTRWfrhlC3zFeyyUA8DcxK5LMOg8sZCyDSUhpJg9Og",
 
