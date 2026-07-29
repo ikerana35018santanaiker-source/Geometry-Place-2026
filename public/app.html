@@ -39,14 +39,59 @@
     </div>
   </section>
 
+  <!-- ===================== Vista: Encuesta de modo ===================== -->
+  <section class="view view--hidden vote-view" id="view-vote">
+    <div class="vote-view__card">
+      <h2>¿Cómo va a ser el nivel?</h2>
+      <p class="vote-view__timer">Termina en <span id="vote-timer">--:--</span></p>
+
+      <div class="vote-view__options">
+        <button class="vote-option" id="vote-classic-btn">
+          <strong>Clásico</strong>
+          <span>Canvas 1920×1080</span>
+          <span class="vote-option__count"><span id="vote-count-classic">0</span> votos</span>
+        </button>
+        <button class="vote-option" id="vote-platformer-btn">
+          <strong>Plataforma</strong>
+          <span>Canvas 1026×1026</span>
+          <span class="vote-option__count"><span id="vote-count-platformer">0</span> votos</span>
+        </button>
+      </div>
+
+      <p class="vote-view__hint" id="vote-my-choice"></p>
+    </div>
+  </section>
+
   <!-- ===================== Vista: Canvas ===================== -->
   <section class="view view--hidden" id="view-canvas">
-    <div class="status-bar">
+    <div class="canvas-topbar">
+      <div class="canvas-zoom">
+        <button class="icon-btn" id="zoom-out-btn">−</button>
+        <button class="icon-btn" id="zoom-in-btn">+</button>
+      </div>
       <span>🟢 Conectados: <strong id="online-count">0</strong></span>
     </div>
-    <div class="gd-canvas-wrap">
+
+    <div class="gd-canvas-viewport" id="gd-canvas-viewport">
       <div class="gd-canvas" id="gd-canvas"></div>
-      <div class="object-selector" id="object-selector"></div>
+    </div>
+
+    <div class="canvas-bottombar">
+      <div class="mode-switch" id="mode-switch">
+        <button class="mode-switch__btn mode-switch__btn--active" data-mode="build">Build</button>
+        <button class="mode-switch__btn" data-mode="edit">Edit</button>
+        <button class="mode-switch__btn" data-mode="delete">Delete</button>
+      </div>
+
+      <div class="tools-panel">
+        <div class="tools-panel__tabs" id="tools-tabs"></div>
+        <div class="tools-panel__grid" id="tools-grid"></div>
+      </div>
+
+      <div class="cooldown-display">
+        <span class="cooldown-display__label" id="cooldown-label">PLACE</span>
+        <span class="cooldown-display__time" id="cooldown-time">00:00</span>
+      </div>
     </div>
   </section>
 
@@ -58,7 +103,7 @@
 
       <div class="admin-actions">
         <input type="datetime-local" id="schedule-date" />
-        <button class="btn" id="schedule-event-btn">Programar inicio (dura 7 días)</button>
+        <button class="btn" id="schedule-event-btn">Programar inicio del contador</button>
         <button class="btn" id="finish-event-btn">Forzar fin del evento</button>
         <span id="event-status"></span>
       </div>
