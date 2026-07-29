@@ -16,8 +16,8 @@
     <button class="btn" id="admin-nav-btn" style="display:none">Admin</button>
 
     <div class="app-header__account">
-      <img class="app-header__account-icon" id="account-icon" alt="" />
       <span class="app-header__username" id="username-label"></span>
+      <img class="app-header__account-icon" id="account-icon" alt="" />
     </div>
 
     <button class="btn" id="logout-btn">Salir</button>
@@ -57,7 +57,8 @@
       <h2>Panel de administración</h2>
 
       <div class="admin-actions">
-        <button class="btn" id="start-event-btn">Iniciar evento (7 días)</button>
+        <input type="datetime-local" id="schedule-date" />
+        <button class="btn" id="schedule-event-btn">Programar inicio (dura 7 días)</button>
         <button class="btn" id="finish-event-btn">Forzar fin del evento</button>
         <span id="event-status"></span>
       </div>
