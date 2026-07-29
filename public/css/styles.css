@@ -1,6 +1,6 @@
 @font-face {
   font-family: "GDFont";
-  src: url("/assets/fonts/Pusab.otf") format("opentype");
+  src: url("/assets/fonts/pusab.otf") format("opentype");
   /* Cambia el nombre de archivo al de tu fuente real dentro de assets/fonts/ */
 }
 
@@ -416,30 +416,6 @@ body {
 .vote-option--selected { border-color: #7fffa0; box-shadow: 0 0 0 2px rgba(127,255,160,0.4); }
 .vote-option__count { font-size: 13px; opacity: 0.75; }
 .vote-view__hint { margin-top: 16px; font-size: 13px; opacity: 0.8; }
-
-/* Consola (temporal) */
-.console-output {
-  margin-top: 12px;
-  max-height: 70vh;
-  overflow-y: auto;
-  background: #05070c;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 6px;
-  padding: 10px;
-  font-family: "Courier New", monospace;
-  font-size: 12px;
-}
-.console-line {
-  padding: 4px 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.console-line--log { color: #cfe0ff; }
-.console-line--info { color: #7fb0ff; }
-.console-line--warn { color: #ffd166; }
-.console-line--error { color: #ff6b6b; }
-.console-line__time { opacity: 0.5; margin-right: 6px; }
 
 /* Admin */
 .admin-panel { max-width: 900px; margin: 30px auto; padding: 0 20px; }
