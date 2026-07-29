@@ -167,6 +167,7 @@ function pollForSchedule() {
       // si falla la comprobación, se reintenta en el siguiente ciclo
     }
   }, 5000);
+}
 
 // ------------------------------------------------------------------
 // Vista: Encuesta de modo
