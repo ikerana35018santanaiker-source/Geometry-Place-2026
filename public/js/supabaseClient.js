@@ -52,3 +52,21 @@ export function subscribeToPresence(onChange) {
     .on("postgres_changes", { event: "*", schema: "public", table: "presence" }, () => onChange?.())
     .subscribe();
 }
+
+// Encuesta de modo (clásico/plataforma): recuento de votos en tiempo real
+export async function fetchVoteTally() {
+  const { data, error } = await supabase.from("mode_vote").select("mode");
+  if (error) throw error;
+  const tally = { classic: 0, platformer: 0 };
+  for (const row of data) {
+    if (tally[row.mode] !== undefined) tally[row.mode]++;
+  }
+  return tally;
+}
+
+export function subscribeToVotes(onChange) {
+  return supabase
+    .channel("mode-vote-realtime")
+    .on("postgres_changes", { event: "*", schema: "public", table: "mode_vote" }, () => onChange?.())
+    .subscribe();
+}
