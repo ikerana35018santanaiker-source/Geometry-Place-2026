@@ -283,6 +283,7 @@ function applyCanvasSize() {
   const canvasEl = document.getElementById("gd-canvas");
   canvasEl.style.width = `${size.width * zoomScale}px`;
   canvasEl.style.height = `${size.height * zoomScale}px`;
+  canvasEl.style.backgroundSize = `${GRID_UNIT_PX * zoomScale}px ${GRID_UNIT_PX * zoomScale}px`;
   canvasEl.classList.remove("mode-build", "mode-edit", "mode-delete");
   canvasEl.classList.add(`mode-${currentTool}`);
 }
@@ -717,6 +718,7 @@ function applyTestCanvasSize() {
   const canvasEl = document.getElementById("test-canvas");
   canvasEl.style.width = `${size.width * testState.zoom}px`;
   canvasEl.style.height = `${size.height * testState.zoom}px`;
+  canvasEl.style.backgroundSize = `${GRID_UNIT_PX * testState.zoom}px ${GRID_UNIT_PX * testState.zoom}px`;
   canvasEl.classList.remove("mode-build", "mode-edit", "mode-delete");
   canvasEl.classList.add(`mode-${testState.tool}`);
 }
