@@ -25,13 +25,22 @@ function single(key, label, file) {
   return [{ key, label, file }];
 }
 
+// Sobreescribe el "file" de un item concreto dentro de un array ya generado
+// por seq() — útil cuando solo UNA variante numerada tiene una imagen subida
+// con otro nombre/extensión (ej: la 01 en .webp y el resto pendientes en .png)
+function overrideFile(items, key, newFile) {
+  const item = items.find((i) => i.key === key);
+  if (item) item.file = newFile;
+  return items;
+}
+
 export const CATEGORY_TABS = [
   // ---------------------------------------------------------
   {
     id: "blocks",
     label: "Bloques",
     groups: [
-      { label: "Regular", items: single("regular_block_01", "Bloque regular", "RegularBlock01.png") },
+      { label: "Regular", items: single("regular_block_01", "Bloque regular", "RegularBlock01.webp") },
       { label: "Grid", items: seq("GridBlock", 1, 8, "Grid") },
       { label: "Tile", items: seq("TileBlock", 1, 7, "Tile") },
       { label: "Chipped", items: seq("ChippedBlock", 1, 6, "Chipped") },
@@ -81,7 +90,7 @@ export const CATEGORY_TABS = [
     id: "outlines",
     label: "Contornos",
     groups: [
-      { label: "Bloque", items: seq("BlockOutline", 1, 5, "Contorno") },
+      { label: "Bloque", items: overrideFile(seq("BlockOutline", 1, 5, "Contorno"), "blockoutline01", "BlockOutline01.webp") },
       { label: "Otras plataformas", items: seq("PlatformOutline", 1, 8, "Contorno") },
       { label: "Pendiente", items: seq("SlopeOutline", 1, 2, "Contorno") },
       { label: "Esquinas", items: seq("Cornerpiece", 1, 4, "Esquina") },
@@ -92,7 +101,7 @@ export const CATEGORY_TABS = [
     id: "spikes-pits",
     label: "Pinchos y fosos",
     groups: [
-      { label: "Pincho regular", items: seq("RegularSpike", 1, 4, "Pincho") },
+      { label: "Pincho regular", items: overrideFile(seq("RegularSpike", 1, 4, "Pincho"), "regularspike01", "RegularSpike01.webp") },
       { label: "Pincho de color", items: seq("ColourSpike", 1, 4, "Pincho color") },
       { label: "Pincho contorno", items: seq("OutlineSpike", 1, 3, "Pincho contorno") },
       { label: "Pincho falso", items: seq("FakeSpike", 1, 4, "Pincho falso") },
@@ -221,7 +230,7 @@ export const CATEGORY_TABS = [
         items: [
           { key: "user_coin_unverified", label: "Moneda de usuario (sin verificar)", file: "UserCoinUnverified.png" },
           { key: "user_coin_verified", label: "Moneda de usuario (verificada)", file: "UserCoinVerified.png" },
-          { key: "game_text", label: "Texto", file: "GameText.png" },
+          { key: "game_text", label: "Texto", file: "GameText.webp" },
         ],
       },
     ],
