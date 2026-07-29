@@ -62,6 +62,92 @@ body {
 .auth-card__switch { text-align: center; margin-top: 10px; font-size: 14px; }
 .auth-card__switch a { color: #7fb0ff; cursor: pointer; }
 
+/* ===================== App unificada (app.html) ===================== */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.app-header__logo { height: 36px; }
+.app-header__spacer { flex: 1; }
+.app-header__account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-header__account-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.app-header__username { font-size: 14px; }
+
+/* Cada "vista" ocupa toda la pantalla, se muestran/ocultan con .view--hidden */
+.view { min-height: calc(100vh - 54px); }
+.view--hidden { display: none; }
+
+/* Vista contador */
+.countdown-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: calc(100vh - 54px);
+  padding: 20px;
+}
+.countdown-view__center {
+  flex: 1;
+  max-width: 720px;
+  text-align: center;
+}
+.countdown-view__waiting {
+  margin-top: 10px;
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+/* Listas laterales de usuarios registrados, con scroll infinito + fade */
+.user-ticker {
+  width: 160px;
+  height: 60vh;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+}
+.user-ticker__track {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: user-ticker-scroll 30s linear infinite;
+}
+.user-ticker--reverse .user-ticker__track {
+  animation-direction: reverse;
+}
+.user-ticker__item {
+  text-align: center;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0;
+  animation: user-ticker-fade-in 0.6s ease forwards;
+}
+@keyframes user-ticker-scroll {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+@keyframes user-ticker-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Landing de bienvenida (sin topbar) */
 .landing {
   position: relative;
