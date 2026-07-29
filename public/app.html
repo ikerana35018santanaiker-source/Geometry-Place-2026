@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Geometry Place</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <header class="app-header">
+    <img class="app-header__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
+    <div class="app-header__spacer"></div>
+
+    <button class="btn" id="test-nav-btn">Test</button>
+    <button class="btn" id="admin-nav-btn" style="display:none">Admin</button>
+
+    <div class="app-header__account">
+      <img class="app-header__account-icon" id="account-icon" alt="" />
+      <span class="app-header__username" id="username-label"></span>
+    </div>
+
+    <button class="btn" id="logout-btn">Salir</button>
+  </header>
+
+  <!-- ===================== Vista: Contador ===================== -->
+  <section class="view countdown-view" id="view-countdown">
+    <div class="user-ticker" id="ticker-left">
+      <div class="user-ticker__track"></div>
+    </div>
+
+    <div class="countdown-view__center">
+      <div id="countdown"></div>
+      <p class="countdown-view__waiting" id="countdown-waiting-text"></p>
+    </div>
+
+    <div class="user-ticker user-ticker--reverse" id="ticker-right">
+      <div class="user-ticker__track"></div>
+    </div>
+  </section>
+
+  <!-- ===================== Vista: Canvas ===================== -->
+  <section class="view view--hidden" id="view-canvas">
+    <div class="status-bar">
+      <span>🟢 Conectados: <strong id="online-count">0</strong></span>
+    </div>
+    <div class="gd-canvas-wrap">
+      <div class="gd-canvas" id="gd-canvas"></div>
+      <div class="object-selector" id="object-selector"></div>
+    </div>
+  </section>
+
+  <!-- ===================== Vista: Admin ===================== -->
+  <section class="view view--hidden" id="view-admin">
+    <div class="admin-panel">
+      <button class="btn" id="admin-back-btn">← Volver</button>
+      <h2>Panel de administración</h2>
+
+      <div class="admin-actions">
+        <button class="btn" id="start-event-btn">Iniciar evento (7 días)</button>
+        <button class="btn" id="finish-event-btn">Forzar fin del evento</button>
+        <span id="event-status"></span>
+      </div>
+
+      <h3>Usuarios</h3>
+      <table>
+        <thead>
+          <tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr>
+        </thead>
+        <tbody id="users-table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== Vista: Test (temporal, quitar antes de publicar) ===================== -->
+  <section class="view view--hidden" id="view-test">
+    <div class="admin-panel">
+      <button class="btn" id="test-back-btn">← Volver</button>
+      <h2>Panel de testeo</h2>
+
+      <h3>1. Probar el contador con una fecha a medida</h3>
+      <input type="datetime-local" id="test-date" />
+      <button class="btn" id="test-countdown-btn">Probar contador</button>
+      <div id="test-countdown-container"></div>
+
+      <h3>2. Probar endpoints del Worker</h3>
+      <button class="btn" id="ping-worker-btn">Ping /api/event/state</button>
+      <pre id="ping-result" style="white-space:pre-wrap;background:#0f1830;padding:10px;border-radius:6px"></pre>
+
+      <h3>3. Comprobar sesión actual</h3>
+      <button class="btn" id="check-session-btn">Comprobar /api/auth/me</button>
+      <pre id="session-result" style="white-space:pre-wrap;background:#0f1830;padding:10px;border-radius:6px"></pre>
+    </div>
+  </section>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
