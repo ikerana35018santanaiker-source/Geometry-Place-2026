@@ -330,6 +330,21 @@ export const CATEGORY_TABS = [
   },
 ];
 
+// Claves de objetos que, a diferencia de un bloque, se apoyan SOBRE la
+// superficie en vez de ocupar toda la casilla — su punto de referencia debe
+// quedar pegado al borde inferior de la casilla, no centrado en ella.
+export const BOTTOM_ANCHORED_KEYS = new Set([
+  "pad_yellow_jump",
+  "pad_magenta_jump",
+  "pad_red_jump",
+  "pad_cyan_gravity",
+  "pad_spider_teleport",
+]);
+
+export function isBottomAnchored(key) {
+  return BOTTOM_ANCHORED_KEYS.has(key);
+}
+
 // Índice plano key → item, útil para renderizar un bloque ya colocado
 // sin tener que recorrer todas las categorías cada vez.
 export const OBJECT_INDEX = new Map();
