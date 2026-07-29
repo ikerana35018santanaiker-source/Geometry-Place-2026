@@ -24,7 +24,7 @@
       <h1 id="form-title">Iniciar sesión</h1>
 
       <form id="login-form">
-        <input type="email" id="login-email" placeholder="Correo" required />
+        <input type="text" id="login-identifier" placeholder="Usuario o correo" required />
         <input type="password" id="login-password" placeholder="Contraseña" required />
         <div class="auth-card__error" id="login-error"></div>
         <button class="btn" type="submit" style="width:100%">Entrar</button>
@@ -58,8 +58,8 @@
       video.src = CONFIG.BACKGROUND_PATH;
     });
 
-    // Si ya hay sesión activa, va directo al canvas
-    fetchMe().then((user) => { if (user) window.location.href = "/canvas.html"; });
+    // Si ya hay sesión activa, va directo a la app
+    fetchMe().then((user) => { if (user) window.location.href = "/app.html"; });
 
     landingEnterBtn.addEventListener("click", () => {
       landingScreen.classList.add("landing--hidden");
@@ -94,10 +94,10 @@
       errorEl.textContent = "";
       try {
         await login(
-          document.getElementById("login-email").value,
+          document.getElementById("login-identifier").value,
           document.getElementById("login-password").value
         );
-        window.location.href = "/canvas.html";
+        window.location.href = "/app.html";
       } catch (err) {
         errorEl.textContent = err.message;
       }
@@ -113,7 +113,7 @@
           document.getElementById("register-username").value,
           document.getElementById("register-password").value
         );
-        window.location.href = "/canvas.html";
+        window.location.href = "/app.html";
       } catch (err) {
         errorEl.textContent = err.message;
       }
