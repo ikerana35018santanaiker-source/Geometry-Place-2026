@@ -5,6 +5,7 @@
 <title>Geometry Place</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="/css/styles.css" />
+<script src="/js/devconsole.js"></script>
 </head>
 <body>
 
@@ -12,7 +13,6 @@
     <img class="app-header__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
     <div class="app-header__spacer"></div>
 
-    <button class="btn" id="console-nav-btn">Consola</button>
     <button class="btn" id="test-nav-btn">Test</button>
     <button class="btn" id="admin-nav-btn" style="display:none">Admin</button>
 
@@ -93,16 +93,6 @@
         <span class="cooldown-display__label" id="cooldown-label">PLACE</span>
         <span class="cooldown-display__time" id="cooldown-time">00:00</span>
       </div>
-    </div>
-  </section>
-
-  <!-- ===================== Vista: Consola (temporal, quitar antes de publicar) ===================== -->
-  <section class="view view--hidden" id="view-console">
-    <div class="admin-panel">
-      <button class="btn" id="console-back-btn">← Volver</button>
-      <button class="btn" id="console-clear-btn">Limpiar</button>
-      <h2>Consola (logs y errores del navegador)</h2>
-      <div id="console-output" class="console-output"></div>
     </div>
   </section>
 
