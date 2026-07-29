@@ -48,13 +48,18 @@ export async function register(email, username, password) {
   return data.user;
 }
 
-export async function login(email, password) {
+export async function login(identifier, password) {
   const data = await apiCall("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ identifier, password }),
   });
   saveSession(data.token, data.user);
   return data.user;
+}
+
+export async function fetchPublicUsers() {
+  const data = await apiCall("/api/users/public");
+  return data.usernames;
 }
 
 export async function logout() {
@@ -83,19 +88,10 @@ export async function fetchMe() {
   }
 }
 
-// Redirige a login si no hay sesión válida. Útil al principio de canvas.js / admin.js
+// Redirige a login si no hay sesión válida. Útil al principio de app.js
 export async function requireAuth(redirectTo = "/index.html") {
   const user = await fetchMe();
   if (!user) {
-    window.location.href = redirectTo;
-    return null;
-  }
-  return user;
-}
-
-export async function requireAdmin(redirectTo = "/canvas.html") {
-  const user = await requireAuth("/index.html");
-  if (user && user.role !== "admin") {
     window.location.href = redirectTo;
     return null;
   }
