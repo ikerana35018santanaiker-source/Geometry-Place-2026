@@ -146,8 +146,27 @@ async function loadEventStateAndRoute() {
   } else {
     countdownEl.innerHTML = "";
     waitingEl.textContent = "Esperando a que el admin programe el evento…";
+    pollForSchedule();
   }
 }
+
+// Mientras nadie ha programado fecha todavía, comprueba cada 5s si el admin
+// ya lo hizo, y recarga la página automáticamente para todos los conectados
+// (el estado del evento vive en D1, que no tiene tiempo real como Supabase,
+// así que el sondeo periódico es la forma más simple de mantenerlo sincronizado).
+function pollForSchedule() {
+  const handle = setInterval(async () => {
+    try {
+      const res = await fetch(`${CONFIG.WORKER_URL}/api/event/state`);
+      const { event } = await res.json();
+      if (event.status !== "pending" || event.starts_at) {
+        clearInterval(handle);
+        window.location.reload();
+      }
+    } catch {
+      // si falla la comprobación, se reintenta en el siguiente ciclo
+    }
+  }, 5000);
 
 // ------------------------------------------------------------------
 // Vista: Encuesta de modo
