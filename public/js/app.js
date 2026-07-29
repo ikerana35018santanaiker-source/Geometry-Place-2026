@@ -7,6 +7,7 @@ import {
 } from "./supabaseClient.js";
 import { Countdown } from "./countdown.js";
 import { CATEGORY_TABS, getObjectFile } from "./objects-catalog.js";
+import { exportLevelAsGmd, downloadGmdFile } from "./gmd-export.js";
 
 const CANVAS_SIZES = {
   classic: { width: 1920, height: 1080 },
@@ -637,6 +638,255 @@ function wireTestView() {
       out.textContent = "Error: " + err.message;
     }
   });
+
+  wireTestCanvasSandbox();
+}
+
+// ------------------------------------------------------------------
+// Sandbox de pruebas (temporal — quitar antes de publicar)
+// Canvas 100% local: no llama a Supabase ni al Worker, no tiene cooldown.
+// Sirve para probar el editor y generar un level.json de prueba.
+// ------------------------------------------------------------------
+const testState = {
+  mode: "classic",
+  zoom: 1,
+  tool: "build",
+  activeTabId: CATEGORY_TABS[0].id,
+  selectedObjectKey: null,
+  blocks: new Map(), // id -> { id, object_type, x, y, rotation, scale, color, z_index }
+};
+
+function wireTestCanvasSandbox() {
+  buildTestTabs();
+  buildTestGrid();
+  applyTestCanvasSize();
+  wireTestCanvasClicks();
+
+  document.querySelectorAll('input[name="test-canvas-mode"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      if (!e.target.checked) return;
+      testState.mode = e.target.value;
+      applyTestCanvasSize();
+    });
+  });
+
+  document.querySelectorAll("#test-mode-switch .mode-switch__btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      testState.tool = btn.dataset.mode;
+      document.querySelectorAll("#test-mode-switch .mode-switch__btn").forEach((b) =>
+        b.classList.toggle("mode-switch__btn--active", b === btn)
+      );
+      const canvasEl = document.getElementById("test-canvas");
+      canvasEl.classList.remove("mode-build", "mode-edit", "mode-delete");
+      canvasEl.classList.add(`mode-${testState.tool}`);
+    });
+  });
+
+  document.getElementById("test-zoom-in-btn").addEventListener("click", () => setTestZoom(testState.zoom * 1.25));
+  document.getElementById("test-zoom-out-btn").addEventListener("click", () => setTestZoom(testState.zoom / 1.25));
+
+  document.getElementById("test-canvas-reset-btn").addEventListener("click", () => {
+    if (!confirm("¿Vaciar todo el canvas de pruebas?")) return;
+    testState.blocks.clear();
+    document.getElementById("test-canvas").innerHTML = "";
+    updateTestObjectCount();
+  });
+
+  document.getElementById("test-canvas-export-btn").addEventListener("click", exportTestLevelJson);
+  document.getElementById("test-canvas-export-gmd-btn").addEventListener("click", exportTestLevelGmd);
+}
+
+function setTestZoom(newZoom) {
+  testState.zoom = Math.min(3, Math.max(0.15, newZoom));
+  applyTestCanvasSize();
+  for (const block of testState.blocks.values()) renderTestBlock(block);
+}
+
+function applyTestCanvasSize() {
+  const size = CANVAS_SIZES[testState.mode] || CANVAS_SIZES.classic;
+  const canvasEl = document.getElementById("test-canvas");
+  canvasEl.style.width = `${size.width * testState.zoom}px`;
+  canvasEl.style.height = `${size.height * testState.zoom}px`;
+  canvasEl.classList.remove("mode-build", "mode-edit", "mode-delete");
+  canvasEl.classList.add(`mode-${testState.tool}`);
+}
+
+function buildTestTabs() {
+  const tabsEl = document.getElementById("test-tools-tabs");
+  tabsEl.innerHTML = "";
+  for (const tab of CATEGORY_TABS) {
+    const btn = document.createElement("button");
+    btn.textContent = tab.label;
+    btn.className = tab.id === testState.activeTabId ? "active" : "";
+    btn.addEventListener("click", () => {
+      testState.activeTabId = tab.id;
+      buildTestTabs();
+      buildTestGrid();
+    });
+    tabsEl.appendChild(btn);
+  }
+}
+
+function buildTestGrid() {
+  const gridEl = document.getElementById("test-tools-grid");
+  gridEl.innerHTML = "";
+  const tab = CATEGORY_TABS.find((t) => t.id === testState.activeTabId);
+  for (const group of tab.groups) {
+    for (const item of group.items) {
+      const btn = document.createElement("button");
+      btn.className =
+        "tools-panel__item" + (item.key === testState.selectedObjectKey ? " tools-panel__item--active" : "");
+      btn.title = item.label;
+      btn.innerHTML = `<img src="${CONFIG.OBJECTS_PATH}${item.file}" alt="${item.label}" />`;
+      btn.addEventListener("click", () => {
+        testState.selectedObjectKey = item.key;
+        buildTestGrid();
+      });
+      gridEl.appendChild(btn);
+    }
+  }
+}
+
+function screenToTestCanvas(clientX, clientY) {
+  const viewport = document.getElementById("test-canvas-viewport");
+  const rect = viewport.getBoundingClientRect();
+  const xInViewport = clientX - rect.left + viewport.scrollLeft;
+  const yInViewport = clientY - rect.top + viewport.scrollTop;
+  return { x: xInViewport / testState.zoom, y: yInViewport / testState.zoom };
+}
+
+function wireTestCanvasClicks() {
+  const canvasEl = document.getElementById("test-canvas");
+  canvasEl.addEventListener("click", (e) => {
+    if (testState.tool !== "build" || !testState.selectedObjectKey) return;
+    const { x, y } = screenToTestCanvas(e.clientX, e.clientY);
+    const block = {
+      id: crypto.randomUUID(),
+      object_type: testState.selectedObjectKey,
+      x, y,
+      rotation: 0,
+      scale: 1,
+      color: null,
+      z_index: 0,
+    };
+    testState.blocks.set(block.id, block);
+    renderTestBlock(block);
+    updateTestObjectCount();
+  });
+}
+
+function renderTestBlock(block) {
+  const canvasEl = document.getElementById("test-canvas");
+  let el = document.getElementById(`test-block-${block.id}`);
+  if (!el) {
+    el = document.createElement("img");
+    el.id = `test-block-${block.id}`;
+    el.className = "gd-canvas__object";
+    canvasEl.appendChild(el);
+    attachTestBlockHandlers(el, block);
+  }
+  const file = getObjectFile(block.object_type);
+  el.src = file ? `${CONFIG.OBJECTS_PATH}${file}` : "";
+  el.style.left = `${block.x * testState.zoom}px`;
+  el.style.top = `${block.y * testState.zoom}px`;
+  const baseSize = 32 * testState.zoom * (block.scale || 1);
+  el.style.width = `${baseSize}px`;
+  el.style.height = `${baseSize}px`;
+  el.style.transform = `translate(-50%, -50%) rotate(${block.rotation || 0}deg)`;
+  el._block = block;
+}
+
+function attachTestBlockHandlers(el, block) {
+  el.addEventListener("pointerdown", (e) => {
+    const current = el._block || block;
+    if (testState.tool === "delete") {
+      e.stopPropagation();
+      testState.blocks.delete(current.id);
+      el.remove();
+      updateTestObjectCount();
+    } else if (testState.tool === "edit") {
+      e.stopPropagation();
+      el.setPointerCapture(e.pointerId);
+      const onMove = (ev) => {
+        const { x, y } = screenToTestCanvas(ev.clientX, ev.clientY);
+        current.x = x;
+        current.y = y;
+        renderTestBlock(current);
+      };
+      const onUp = () => {
+        el.removeEventListener("pointermove", onMove);
+        el.removeEventListener("pointerup", onUp);
+      };
+      el.addEventListener("pointermove", onMove);
+      el.addEventListener("pointerup", onUp);
+    }
+  });
+}
+
+function updateTestObjectCount() {
+  document.getElementById("test-object-count").textContent = `${testState.blocks.size} objetos`;
+}
+
+// Exporta el canvas de pruebas como level.json — mismo formato que se usará
+// para el nivel final real al terminar el evento de verdad.
+function exportTestLevelJson() {
+  const size = CANVAS_SIZES[testState.mode];
+  const payload = {
+    mode: testState.mode,
+    canvas_width: size.width,
+    canvas_height: size.height,
+    exported_at: new Date().toISOString(),
+    objects: [...testState.blocks.values()].map((b) => ({
+      object_type: b.object_type,
+      x: b.x,
+      y: b.y,
+      rotation: b.rotation,
+      scale: b.scale,
+      color: b.color,
+      z_index: b.z_index,
+    })),
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "level.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Exporta el canvas de pruebas como .gmd real de Geometry Dash (ver
+// gmd-export.js). Solo los objetos con ID verificado en gd-object-ids.js
+// se incluyen — el resto se omite y se avisa cuántos faltan.
+async function exportTestLevelGmd() {
+  const size = CANVAS_SIZES[testState.mode];
+  const objects = [...testState.blocks.values()];
+
+  if (objects.length === 0) {
+    alert("El canvas de pruebas está vacío.");
+    return;
+  }
+
+  const { plist, skipped, totalObjects, exportedObjects } = await exportLevelAsGmd({
+    mode: testState.mode,
+    objects,
+    canvasHeightPx: size.height,
+    name: "Geometry Place (prueba)",
+    author: currentUser?.username || "Geometry Place",
+  });
+
+  downloadGmdFile(plist, "level.gmd");
+
+  if (skipped.length > 0) {
+    const uniqueSkipped = [...new Set(skipped)];
+    alert(
+      `Exportados ${exportedObjects} de ${totalObjects} objetos.\n\n` +
+      `${skipped.length} objetos se omitieron porque todavía no tienen un ID de ` +
+      `Geometry Dash verificado en gd-object-ids.js:\n\n` +
+      uniqueSkipped.join(", ")
+    );
+  }
 }
 
 init();
