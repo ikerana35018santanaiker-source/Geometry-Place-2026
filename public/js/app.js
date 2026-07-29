@@ -6,7 +6,7 @@ import {
   fetchVoteTally, subscribeToVotes,
 } from "./supabaseClient.js";
 import { Countdown } from "./countdown.js";
-import { CATEGORY_TABS, getObjectFile } from "./objects-catalog.js";
+import { CATEGORY_TABS, getObjectFile, isBottomAnchored } from "./objects-catalog.js";
 import { exportLevelAsGmd, downloadGmdFile } from "./gmd-export.js";
 
 const CANVAS_SIZES = {
@@ -16,11 +16,15 @@ const CANVAS_SIZES = {
 const COOLDOWN_MS = 5 * 60 * 1000;
 const GRID_UNIT_PX = 32; // mismo tamaño que usa el CSS de fondo de cuadrícula y gmd-export.js
 
-// Ajusta unas coordenadas al centro de la casilla de cuadrícula más cercana
-// (como en el editor real de Geometry Dash: los objetos se colocan por casillas)
-function snapToGrid(x, y) {
+// Ajusta unas coordenadas a la casilla de cuadrícula más cercana (como en el
+// editor real de Geometry Dash: los objetos se colocan por casillas).
+// anchor "center" → punto en el centro de la casilla (bloques, la mayoría de objetos)
+// anchor "bottom" → punto en el borde inferior de la casilla (pads: se apoyan
+// sobre la superficie en vez de ocupar/centrarse en toda la casilla)
+function snapToGrid(x, y, anchor = "center") {
   const snappedX = Math.floor(x / GRID_UNIT_PX) * GRID_UNIT_PX + GRID_UNIT_PX / 2;
-  const snappedY = Math.floor(y / GRID_UNIT_PX) * GRID_UNIT_PX + GRID_UNIT_PX / 2;
+  const cellTop = Math.floor(y / GRID_UNIT_PX) * GRID_UNIT_PX;
+  const snappedY = anchor === "bottom" ? cellTop + GRID_UNIT_PX : cellTop + GRID_UNIT_PX / 2;
   return { x: snappedX, y: snappedY };
 }
 
@@ -338,7 +342,7 @@ function wireCanvasClicks() {
     if (currentTool !== "build" || !selectedObjectKey) return;
     if (cooldowns.place > 0) return;
     const raw = screenToCanvas(e.clientX, e.clientY);
-    const { x, y } = snapToGrid(raw.x, raw.y);
+    const { x, y } = snapToGrid(raw.x, raw.y, isBottomAnchored(selectedObjectKey) ? "bottom" : "center");
     try {
       const data = await authedApiCall("/api/blocks/place", {
         method: "POST",
@@ -384,7 +388,8 @@ function renderBlock(block) {
   const baseSize = 32 * zoomScale * (block.scale || 1);
   el.style.width = `${baseSize}px`;
   el.style.height = `${baseSize}px`;
-  el.style.transform = `translate(-50%, -50%) rotate(${block.rotation || 0}deg)`;
+  const originY = isBottomAnchored(block.object_type) ? "-100%" : "-50%";
+  el.style.transform = `translate(-50%, ${originY}) rotate(${block.rotation || 0}deg)`;
   el.style.zIndex = block.z_index || 0;
   if (block.color) el.style.filter = `drop-shadow(0 0 0 ${block.color})`;
   el._block = block;
@@ -772,7 +777,7 @@ function wireTestCanvasClicks() {
   canvasEl.addEventListener("click", (e) => {
     if (testState.tool !== "build" || !testState.selectedObjectKey) return;
     const raw = screenToTestCanvas(e.clientX, e.clientY);
-    const { x, y } = snapToGrid(raw.x, raw.y);
+    const { x, y } = snapToGrid(raw.x, raw.y, isBottomAnchored(testState.selectedObjectKey) ? "bottom" : "center");
     const block = {
       id: crypto.randomUUID(),
       object_type: testState.selectedObjectKey,
@@ -805,7 +810,8 @@ function renderTestBlock(block) {
   const baseSize = 32 * testState.zoom * (block.scale || 1);
   el.style.width = `${baseSize}px`;
   el.style.height = `${baseSize}px`;
-  el.style.transform = `translate(-50%, -50%) rotate(${block.rotation || 0}deg)`;
+  const originY = isBottomAnchored(block.object_type) ? "-100%" : "-50%";
+  el.style.transform = `translate(-50%, ${originY}) rotate(${block.rotation || 0}deg)`;
   el._block = block;
 }
 
