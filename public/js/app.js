@@ -120,7 +120,13 @@ async function loadEventStateAndRoute() {
 
   if (event.status === "pending" && event.starts_at) {
     waitingEl.textContent = "El evento empieza en:";
-    countdownInstance = new Countdown(countdownEl, event.starts_at, () => window.location.reload());
+    countdownInstance = new Countdown(countdownEl, event.starts_at, async () => {
+      try {
+        await fetch(`${CONFIG.WORKER_URL}/api/event/auto-start`, { method: "POST" });
+      } finally {
+        window.location.reload();
+      }
+    });
   } else if (event.status === "finished") {
     countdownEl.innerHTML = "";
     waitingEl.textContent = "El evento ha terminado.";
@@ -224,10 +230,19 @@ async function adminApiCall(path, options = {}) {
 }
 
 function wireAdminView() {
-  document.getElementById("start-event-btn").addEventListener("click", async () => {
-    if (!confirm("¿Seguro que quieres iniciar el evento? Empezará la cuenta atrás de 7 días.")) return;
-    await adminApiCall("/api/admin/start-event", { method: "POST" });
-    await refreshAdminEventState();
+  document.getElementById("schedule-event-btn").addEventListener("click", async () => {
+    const val = document.getElementById("schedule-date").value;
+    if (!val) return alert("Elige primero la fecha y hora de inicio");
+    if (!confirm("¿Programar el inicio del evento para esa fecha? Durará 7 días desde entonces.")) return;
+    try {
+      await adminApiCall("/api/admin/schedule-event", {
+        method: "POST",
+        body: JSON.stringify({ starts_at: new Date(val).toISOString() }),
+      });
+      await refreshAdminEventState();
+    } catch (err) {
+      alert(err.message);
+    }
   });
 
   document.getElementById("finish-event-btn").addEventListener("click", async () => {
