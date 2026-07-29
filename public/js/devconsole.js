@@ -31,7 +31,7 @@ function ensureUI() {
       font-family: "Courier New", monospace; font-size: 12px;
       flex-direction: column;
     }
-    #__devconsole_panel--open { display: flex; }
+    #__devconsole_panel.__devconsole_panel--open { display: flex; }
     #__devconsole_header {
       display: flex; gap: 10px; align-items: center; padding: 10px 14px;
       border-bottom: 1px solid rgba(255,255,255,0.15); flex: none;
