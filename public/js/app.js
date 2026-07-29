@@ -14,6 +14,15 @@ const CANVAS_SIZES = {
   platformer: { width: 1026, height: 1026 },
 };
 const COOLDOWN_MS = 5 * 60 * 1000;
+const GRID_UNIT_PX = 32; // mismo tamaño que usa el CSS de fondo de cuadrícula y gmd-export.js
+
+// Ajusta unas coordenadas al centro de la casilla de cuadrícula más cercana
+// (como en el editor real de Geometry Dash: los objetos se colocan por casillas)
+function snapToGrid(x, y) {
+  const snappedX = Math.floor(x / GRID_UNIT_PX) * GRID_UNIT_PX + GRID_UNIT_PX / 2;
+  const snappedY = Math.floor(y / GRID_UNIT_PX) * GRID_UNIT_PX + GRID_UNIT_PX / 2;
+  return { x: snappedX, y: snappedY };
+}
 
 let currentUser = null;
 let mainViewName = "view-countdown";
@@ -327,7 +336,8 @@ function wireCanvasClicks() {
   canvasEl.addEventListener("click", async (e) => {
     if (currentTool !== "build" || !selectedObjectKey) return;
     if (cooldowns.place > 0) return;
-    const { x, y } = screenToCanvas(e.clientX, e.clientY);
+    const raw = screenToCanvas(e.clientX, e.clientY);
+    const { x, y } = snapToGrid(raw.x, raw.y);
     try {
       const data = await authedApiCall("/api/blocks/place", {
         method: "POST",
@@ -759,7 +769,8 @@ function wireTestCanvasClicks() {
   const canvasEl = document.getElementById("test-canvas");
   canvasEl.addEventListener("click", (e) => {
     if (testState.tool !== "build" || !testState.selectedObjectKey) return;
-    const { x, y } = screenToTestCanvas(e.clientX, e.clientY);
+    const raw = screenToTestCanvas(e.clientX, e.clientY);
+    const { x, y } = snapToGrid(raw.x, raw.y);
     const block = {
       id: crypto.randomUUID(),
       object_type: testState.selectedObjectKey,
