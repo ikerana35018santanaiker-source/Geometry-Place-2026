@@ -137,6 +137,45 @@
       <h3>3. Comprobar sesión actual</h3>
       <button class="btn" id="check-session-btn">Comprobar /api/auth/me</button>
       <pre id="session-result" style="white-space:pre-wrap;background:#0f1830;padding:10px;border-radius:6px"></pre>
+
+      <h3>4. Canvas de pruebas (sandbox local, no toca la base de datos)</h3>
+      <div class="admin-actions">
+        <label><input type="radio" name="test-canvas-mode" value="classic" checked /> Clásico (1920×1080)</label>
+        <label><input type="radio" name="test-canvas-mode" value="platformer" /> Plataforma (1026×1026)</label>
+        <button class="btn" id="test-canvas-reset-btn">Vaciar canvas de pruebas</button>
+        <button class="btn" id="test-canvas-export-btn">Exportar level.json</button>
+        <button class="btn" id="test-canvas-export-gmd-btn">Exportar .gmd (Geometry Dash)</button>
+      </div>
+      <p style="font-size:13px;opacity:0.75;max-width:600px">
+        El .gmd solo incluye los objetos con un ID de Geometry Dash verificado
+        (ver <code>gd-object-ids.js</code>). Los demás se omiten y se avisa
+        cuántos se han quedado fuera.
+      </p>
+    </div>
+
+    <div class="canvas-topbar">
+      <div class="canvas-zoom">
+        <button class="icon-btn" id="test-zoom-out-btn">−</button>
+        <button class="icon-btn" id="test-zoom-in-btn">+</button>
+      </div>
+      <span id="test-object-count">0 objetos</span>
+    </div>
+
+    <div class="gd-canvas-viewport" id="test-canvas-viewport">
+      <div class="gd-canvas" id="test-canvas"></div>
+    </div>
+
+    <div class="canvas-bottombar">
+      <div class="mode-switch" id="test-mode-switch">
+        <button class="mode-switch__btn mode-switch__btn--active" data-mode="build">Build</button>
+        <button class="mode-switch__btn" data-mode="edit">Edit</button>
+        <button class="mode-switch__btn" data-mode="delete">Delete</button>
+      </div>
+
+      <div class="tools-panel">
+        <div class="tools-panel__tabs" id="test-tools-tabs"></div>
+        <div class="tools-panel__grid" id="test-tools-grid"></div>
+      </div>
     </div>
   </section>
 
