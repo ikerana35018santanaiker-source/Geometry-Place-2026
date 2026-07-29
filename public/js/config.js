@@ -13,7 +13,7 @@ export const CONFIG = {
   BACKGROUND_PATH: "/assets/background/initial-bg.mp4",
   FONTS_PATH: "/assets/fonts/",
   ICONS_PATH: "/assets/gd-imgs/",
-  ACCOUNT_ICON_PATH: "/assets/gd-imgs/icons/account-img.jpg",
+  ACCOUNT_ICON_PATH: "/assets/gd-imgs/icons/account-img.png",
   NUMBERS_PATH: "/assets/countdown/", // img_0.png ... img_200.png
   OBJECTS_PATH: "/assets/gd-imgs/objects/",
 };
