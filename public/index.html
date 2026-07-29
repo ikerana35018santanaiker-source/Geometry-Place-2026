@@ -5,180 +5,119 @@
 <title>Geometry Place</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="/css/styles.css" />
-<script src="/js/devconsole.js"></script>
 </head>
 <body>
 
-  <header class="app-header">
-    <img class="app-header__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
-    <div class="app-header__spacer"></div>
+  <!-- Pantalla de bienvenida: vídeo de fondo + logo grande + botón, sin topbar -->
+  <div class="landing" id="landing-screen">
+    <video class="landing__bg-video" autoplay loop muted playsinline></video>
+    <div class="landing__bg-overlay"></div>
+    <img class="landing__logo" src="/assets/logo/Geometry Place.png" alt="Geometry Place" />
+    <button class="btn landing__enter-btn" id="landing-enter-btn">Entrar / Registrarse</button>
+  </div>
 
-    <button class="btn" id="test-nav-btn">Test</button>
-    <button class="btn" id="admin-nav-btn" style="display:none">Admin</button>
+  <!-- Formulario de login/registro (oculto hasta pulsar el botón), con el mismo vídeo de fondo -->
+  <div class="landing landing--hidden" id="auth-screen">
+    <video class="landing__bg-video" autoplay loop muted playsinline></video>
+    <div class="landing__bg-overlay"></div>
+    <div class="auth-card">
+      <h1 id="form-title">Iniciar sesión</h1>
 
-    <div class="app-header__account">
-      <span class="app-header__username" id="username-label"></span>
-      <img class="app-header__account-icon" id="account-icon" alt="" />
-    </div>
+      <form id="login-form">
+        <input type="text" id="login-identifier" placeholder="Usuario o correo" required />
+        <input type="password" id="login-password" placeholder="Contraseña" required />
+        <div class="auth-card__error" id="login-error"></div>
+        <button class="btn" type="submit" style="width:100%">Entrar</button>
+      </form>
 
-    <button class="btn" id="logout-btn">Salir</button>
-  </header>
+      <form id="register-form" style="display:none">
+        <input type="email" id="register-email" placeholder="Correo" required />
+        <input type="text" id="register-username" placeholder="Nombre de usuario" required />
+        <input type="password" id="register-password" placeholder="Contraseña (mín. 8 caracteres)" required />
+        <div class="auth-card__error" id="register-error"></div>
+        <button class="btn" type="submit" style="width:100%">Crear cuenta</button>
+      </form>
 
-  <!-- ===================== Vista: Contador ===================== -->
-  <section class="view countdown-view" id="view-countdown">
-    <div class="user-ticker" id="ticker-left">
-      <div class="user-ticker__track"></div>
-    </div>
-
-    <div class="countdown-view__center">
-      <div id="countdown"></div>
-      <p class="countdown-view__waiting" id="countdown-waiting-text"></p>
-    </div>
-
-    <div class="user-ticker user-ticker--reverse" id="ticker-right">
-      <div class="user-ticker__track"></div>
-    </div>
-  </section>
-
-  <!-- ===================== Vista: Encuesta de modo ===================== -->
-  <section class="view view--hidden vote-view" id="view-vote">
-    <div class="vote-view__card">
-      <h2>¿Cómo va a ser el nivel?</h2>
-      <p class="vote-view__timer">Termina en <span id="vote-timer">--:--</span></p>
-
-      <div class="vote-view__options">
-        <button class="vote-option" id="vote-classic-btn">
-          <strong>Clásico</strong>
-          <span>Canvas 1920×1080</span>
-          <span class="vote-option__count"><span id="vote-count-classic">0</span> votos</span>
-        </button>
-        <button class="vote-option" id="vote-platformer-btn">
-          <strong>Plataforma</strong>
-          <span>Canvas 1026×1026</span>
-          <span class="vote-option__count"><span id="vote-count-platformer">0</span> votos</span>
-        </button>
-      </div>
-
-      <p class="vote-view__hint" id="vote-my-choice"></p>
-    </div>
-  </section>
-
-  <!-- ===================== Vista: Canvas ===================== -->
-  <section class="view view--hidden" id="view-canvas">
-    <div class="canvas-topbar">
-      <div class="canvas-zoom">
-        <button class="icon-btn" id="zoom-out-btn">−</button>
-        <button class="icon-btn" id="zoom-in-btn">+</button>
-      </div>
-      <span>🟢 Conectados: <strong id="online-count">0</strong></span>
-    </div>
-
-    <div class="gd-canvas-viewport" id="gd-canvas-viewport">
-      <div class="gd-canvas" id="gd-canvas"></div>
-    </div>
-
-    <div class="canvas-bottombar">
-      <div class="mode-switch" id="mode-switch">
-        <button class="mode-switch__btn mode-switch__btn--active" data-mode="build">Build</button>
-        <button class="mode-switch__btn" data-mode="edit">Edit</button>
-        <button class="mode-switch__btn" data-mode="delete">Delete</button>
-      </div>
-
-      <div class="tools-panel">
-        <div class="tools-panel__tabs" id="tools-tabs"></div>
-        <div class="tools-panel__grid" id="tools-grid"></div>
-      </div>
-
-      <div class="cooldown-display">
-        <span class="cooldown-display__label" id="cooldown-label">PLACE</span>
-        <span class="cooldown-display__time" id="cooldown-time">00:00</span>
+      <div class="auth-card__switch">
+        <span id="switch-to-register">¿No tienes cuenta? <a>Regístrate</a></span>
+        <span id="switch-to-login" style="display:none">¿Ya tienes cuenta? <a>Inicia sesión</a></span>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ===================== Vista: Admin ===================== -->
-  <section class="view view--hidden" id="view-admin">
-    <div class="admin-panel">
-      <button class="btn" id="admin-back-btn">← Volver</button>
-      <h2>Panel de administración</h2>
+  <script type="module">
+    import { CONFIG } from "/js/config.js";
+    import { login, register, fetchMe } from "/js/auth.js";
 
-      <div class="admin-actions">
-        <input type="datetime-local" id="schedule-date" />
-        <button class="btn" id="schedule-event-btn">Programar inicio del contador</button>
-        <button class="btn" id="finish-event-btn">Forzar fin del evento</button>
-        <span id="event-status"></span>
-      </div>
+    const landingScreen = document.getElementById("landing-screen");
+    const authScreen = document.getElementById("auth-screen");
+    const landingEnterBtn = document.getElementById("landing-enter-btn");
 
-      <h3>Usuarios</h3>
-      <table>
-        <thead>
-          <tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr>
-        </thead>
-        <tbody id="users-table-body"></tbody>
-      </table>
-    </div>
-  </section>
+    // Aplica el mismo vídeo a ambas pantallas
+    document.querySelectorAll(".landing__bg-video").forEach((video) => {
+      video.src = CONFIG.BACKGROUND_PATH;
+    });
 
-  <!-- ===================== Vista: Test (temporal, quitar antes de publicar) ===================== -->
-  <section class="view view--hidden" id="view-test">
-    <div class="admin-panel">
-      <button class="btn" id="test-back-btn">← Volver</button>
-      <h2>Panel de testeo</h2>
+    // Si ya hay sesión activa, va directo a la app
+    fetchMe().then((user) => { if (user) window.location.href = "/app.html"; });
 
-      <h3>1. Probar el contador con una fecha a medida</h3>
-      <input type="datetime-local" id="test-date" />
-      <button class="btn" id="test-countdown-btn">Probar contador</button>
-      <div id="test-countdown-container"></div>
+    landingEnterBtn.addEventListener("click", () => {
+      landingScreen.classList.add("landing--hidden");
+      authScreen.classList.remove("landing--hidden");
+    });
 
-      <h3>2. Probar endpoints del Worker</h3>
-      <button class="btn" id="ping-worker-btn">Ping /api/event/state</button>
-      <pre id="ping-result" style="white-space:pre-wrap;background:#0f1830;padding:10px;border-radius:6px"></pre>
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    const formTitle = document.getElementById("form-title");
+    const switchToRegister = document.getElementById("switch-to-register");
+    const switchToLogin = document.getElementById("switch-to-login");
 
-      <h3>3. Comprobar sesión actual</h3>
-      <button class="btn" id="check-session-btn">Comprobar /api/auth/me</button>
-      <pre id="session-result" style="white-space:pre-wrap;background:#0f1830;padding:10px;border-radius:6px"></pre>
+    switchToRegister.querySelector("a").addEventListener("click", () => {
+      loginForm.style.display = "none";
+      registerForm.style.display = "block";
+      formTitle.textContent = "Crear cuenta";
+      switchToRegister.style.display = "none";
+      switchToLogin.style.display = "block";
+    });
 
-      <h3>4. Canvas de pruebas (sandbox local, no toca la base de datos)</h3>
-      <div class="admin-actions">
-        <label><input type="radio" name="test-canvas-mode" value="classic" checked /> Clásico (1920×1080)</label>
-        <label><input type="radio" name="test-canvas-mode" value="platformer" /> Plataforma (1026×1026)</label>
-        <button class="btn" id="test-canvas-reset-btn">Vaciar canvas de pruebas</button>
-        <button class="btn" id="test-canvas-export-btn">Exportar level.json</button>
-        <button class="btn" id="test-canvas-export-gmd-btn">Exportar .gmd (Geometry Dash)</button>
-      </div>
-      <p style="font-size:13px;opacity:0.75;max-width:600px">
-        El .gmd solo incluye los objetos con un ID de Geometry Dash verificado
-        (ver <code>gd-object-ids.js</code>). Los demás se omiten y se avisa
-        cuántos se han quedado fuera.
-      </p>
-    </div>
+    switchToLogin.querySelector("a").addEventListener("click", () => {
+      registerForm.style.display = "none";
+      loginForm.style.display = "block";
+      formTitle.textContent = "Iniciar sesión";
+      switchToLogin.style.display = "none";
+      switchToRegister.style.display = "block";
+    });
 
-    <div class="canvas-topbar">
-      <div class="canvas-zoom">
-        <button class="icon-btn" id="test-zoom-out-btn">−</button>
-        <button class="icon-btn" id="test-zoom-in-btn">+</button>
-      </div>
-      <span id="test-object-count">0 objetos</span>
-    </div>
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById("login-error");
+      errorEl.textContent = "";
+      try {
+        await login(
+          document.getElementById("login-identifier").value,
+          document.getElementById("login-password").value
+        );
+        window.location.href = "/app.html";
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    });
 
-    <div class="gd-canvas-viewport" id="test-canvas-viewport">
-      <div class="gd-canvas" id="test-canvas"></div>
-    </div>
-
-    <div class="canvas-bottombar">
-      <div class="mode-switch" id="test-mode-switch">
-        <button class="mode-switch__btn mode-switch__btn--active" data-mode="build">Build</button>
-        <button class="mode-switch__btn" data-mode="edit">Edit</button>
-        <button class="mode-switch__btn" data-mode="delete">Delete</button>
-      </div>
-
-      <div class="tools-panel">
-        <div class="tools-panel__tabs" id="test-tools-tabs"></div>
-        <div class="tools-panel__grid" id="test-tools-grid"></div>
-      </div>
-    </div>
-  </section>
-
-  <script type="module" src="/js/app.js"></script>
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById("register-error");
+      errorEl.textContent = "";
+      try {
+        await register(
+          document.getElementById("register-email").value,
+          document.getElementById("register-username").value,
+          document.getElementById("register-password").value
+        );
+        window.location.href = "/app.html";
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    });
+  </script>
 </body>
 </html>
