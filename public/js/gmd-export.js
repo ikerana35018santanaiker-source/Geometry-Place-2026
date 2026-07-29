@@ -189,11 +189,13 @@ export async function exportLevelAsGmd({ mode, objects, canvasHeightPx, name, au
 }
 
 export function downloadGmdFile(plistContent, filename = "level.gmd") {
-  const blob = new Blob([plistContent], { type: "application/xml" });
+  const blob = new Blob([plistContent], { type: "application/octet-stream" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   URL.revokeObjectURL(url);
 }
